@@ -46,10 +46,3 @@ foreach ($folder in $foldersToSearch) {
         }
     }
 }
-# Show completion message
-If ($hidden -eq 'y'){
-    (New-Object -ComObject Wscript.Shell).Popup("File Exfiltration Complete",5,"Exfiltration",0x0)
-}
-else{
-    Write-Host "File Exfiltration Complete" -ForegroundColor Green
-}
